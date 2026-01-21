@@ -25,10 +25,9 @@ router.post("/register", async (req, res) => {
       name,
       email,
       password: hashed,
-      role: role || "viewer"
+      role: "viewer" // default only
     });
 
-    /* optional: auto-login after register */
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
@@ -46,10 +45,11 @@ router.post("/register", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: err.message });
   }
 });
 
+/* LOGIN */
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -71,12 +71,19 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "15m" }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: "7d" }
     );
 
     res.json({
       message: "Login successful",
       token,
+      refreshToken,
       user: {
         id: user._id,
         name: user.name,
@@ -86,6 +93,32 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+/* REFRESH TOKEN */
+router.post("/refresh", async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(401).json({ error: "Refresh token required" });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET
+    );
+
+    const token = jwt.sign(
+      { id: decoded.id, role: decoded.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+
+    res.json({ token });
+  } catch (err) {
+    res.status(403).json({ error: "Invalid refresh token" });
   }
 });
 
