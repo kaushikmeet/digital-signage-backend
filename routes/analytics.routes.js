@@ -1,14 +1,8 @@
 const router = require("express").Router();
-const auth = require("../middleware/auth.middleware");
+const {auth, adminOnly} = require("../middleware/auth.middleware");
+const {getSummary} = require("../controllers/analytics.controller");
 
-router.get("/summary", auth, async (req, res) => {
-  res.json({
-    totalPlays: 120,
-    topMedia: [
-      { _id: "video1.mp4", plays: 55 },
-      { _id: "image2.jpg", plays: 65 }
-    ]
-  });
-});
+/* GET ANALYTICS SUMMARY (admin) */ 
+router.get("/summary", auth, adminOnly, getSummary);
 
 module.exports = router;

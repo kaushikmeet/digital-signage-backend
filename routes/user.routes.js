@@ -1,17 +1,15 @@
 const router = require("express").Router();
-const User = require("../models/User");
-const auth = require("../middleware/auth.middleware.js");
+const { auth, adminOnly } = require("../middleware/auth.middleware");
+const {
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser
+} = require("../controllers/user.controller");
 
-/* GET ALL USERS (admin) */
-router.get("/", auth(["admin"]), async (req, res) => {
-  const users = await User.find({}, "-password");
-  res.json(users);
-});
-
-/* DELETE USER */
-router.delete("/:id", auth(["admin"]), async (req, res) => {
-  await User.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
-});
+router.get("/", auth, adminOnly, getUsers);
+router.get("/:id", auth, adminOnly, getUserById);
+router.put("/:id", auth, adminOnly, updateUser);
+router.delete("/:id", auth, adminOnly, deleteUser);
 
 module.exports = router;
