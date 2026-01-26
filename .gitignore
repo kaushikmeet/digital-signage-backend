@@ -1,0 +1,58 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Configuration files
+config/
+config/*.json
+config/*.js
+
+# Database & connection files
+db/
+database/
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+mongo.config.js
+db.config.js
+
+# Angular build output
+dist/
+out-tsc/
+
+# Cache & temp files
+.cache/
+.tmp/
+temp/
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Coverage reports
+coverage/
+
+# Firebase / cloud configs (if any)
+.firebase/
+.firebaserc
+
+# Misc
+*.tgz
