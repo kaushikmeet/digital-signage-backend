@@ -2,7 +2,7 @@ require("dotenv").config({ path: "./config/.env" });
 const http = require("http");
 const app = require("./app");
 const connectDB = require("./config/db");
-const initSocket = require("./socket");
+const initSocket = require("./Socket");
 
 const server = http.createServer(app);
 
