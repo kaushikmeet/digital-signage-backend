@@ -1,74 +1,40 @@
 const router = require("express").Router();
-const Playlist = require("../models/Playlist");
-const PlaylistItem = require("../models/PlaylistItem");
+const playlistController = require("../controllers/playlist.controller");
+const { auth, adminOnly } = require("../middleware/auth.middleware");
 
-router.get("/", async (req, res) => {
-  const playlists = await Playlist.find();
-  res.json(playlists);
-});
+/* ---------------- PLAYLISTS ---------------- */
 
-/* CREATE playlist */
-router.post("/", async (req, res) => {
-  const playlist = await Playlist.create(req.body);
-  res.json(playlist);
-});
+// create playlist
+router.post("/", auth, playlistController.createPlaylist);
 
-router.get("/:id/items", async (req, res) => {
-  const items = await PlaylistItem
-    .find({ playlistId: req.params.id })
-    .populate("mediaId")
-    .sort({ position: 1 });
+// get all playlists
+router.get("/", auth, playlistController.getAllPlaylists);
 
-  res.json(items);
-});
+// get playlist items
+router.get("/:id/items", auth, playlistController.getPlaylistItems);
 
-router.post("/items", async (req, res) => {
-  const item = await PlaylistItem.create(req.body);
+// get active items (schedule-aware)
+router.get("/:id/active-items", auth, playlistController.ActivePlayListItem);
 
-  const io = req.app.get("io");
-  io.to(`playlist-${item.playlistId}`).emit("playlist-updated", {
-    playlistId: item.playlistId
-  });
 
-  res.json(item);
-});
+/* ---------------- PLAYLIST ITEMS ---------------- */
 
-router.post("/reorder", async (req, res) => {
-  const { playlistId, items } = req.body;
+// create playlist item
+router.post("/items", auth, playlistController.createPlayListItem);
 
-  for (const item of items) {
-    await PlaylistItem.findByIdAndUpdate(item.id, {
-      position: item.position
-    });
-  }
+// get single playlist item
+router.get("/items/:id", auth, playlistController.getPlayListItemById);
 
-  const io = req.app.get("io");
-  io.to(`playlist-${playlistId}`).emit("playlist-updated", {
-    playlistId
-  });
+// update playlist item (general)
+router.put("/items/:id", auth, adminOnly, playlistController.updatePlayListItem);
 
-  res.json({ success: true });
-});
+// delete playlist item
+router.delete("/items/:id", auth, playlistController.deletePlayListItem);
 
-router.delete("/items/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
+// reorder items
+router.put("/items/reorder", auth, playlistController.createReorderItems);
 
-    const deleted = await PlaylistItem.findByIdAndDelete(id);
-
-    if (!deleted) {
-      return res.status(404).json({ error: "Item not found" });
-    }
-
-    // 🔔 socket notify
-    const io = req.app.get("io");
-    io.emit("playlist-updated", { playlistId: deleted.playlistId });
-
-    res.json({ success: true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Delete failed" });
-  }
-});
+// schedule playlist item
+router.put("/items/:id/schedule", auth, playlistController.updatePlaylistItemSchedule);
 
 module.exports = router;

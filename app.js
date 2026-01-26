@@ -26,6 +26,7 @@ app.use("/media", mediaRoutes);
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/analytics", analyticsRoutes);
+app.use("/emergency", require("./routes/emergency.routes"));
 
 /* ---------- HEALTH CHECK ---------- */
 app.get("/", (req, res) => {
