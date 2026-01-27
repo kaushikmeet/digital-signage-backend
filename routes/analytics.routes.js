@@ -7,16 +7,26 @@ const {
   playsByMedia,
   playsByScreen,
   dailyTrend,
-  logPlay
+  logPlay,
+  exportCsv,
+  revenueByMedia,
+  bestTimeSlots,
+  analyticsByScreen,
+  bestHours
 } = require("../controllers/analytics.controller");
 
-
-router.get("/log", auth, logPlay);
 /* ===========================
-   ANALYTICS DASHBOARD
+   ANALYTICS LOGGING (PLAYER)
 =========================== */
 
-// High-level dashboard summary
+// Proof-of-play / analytics logging
+router.post("/log", auth, logPlay);
+
+/* ===========================
+   ANALYTICS DASHBOARD (ADMIN)
+=========================== */
+
+// High-level summary
 router.get("/summary", auth, adminOnly, getSummary);
 
 // KPI metrics (filters: screenId, from, to)
@@ -30,5 +40,20 @@ router.get("/screens", auth, adminOnly, playsByScreen);
 
 // Daily playback trend
 router.get("/daily", auth, adminOnly, dailyTrend);
+
+// Per-screen analytics
+router.get("/screen/:screenId", auth, adminOnly, analyticsByScreen);
+
+// Revenue grouped by media
+router.get("/revenue", auth, adminOnly, revenueByMedia);
+
+// Best time slots (days)
+router.get("/best-timeslot", auth, adminOnly, bestTimeSlots);
+
+// Best hours of the day
+router.get("/best-hours", auth, adminOnly, bestHours);
+
+// Export analytics as CSV
+router.get("/export/csv", auth, adminOnly, exportCsv);
 
 module.exports = router;
