@@ -12,6 +12,10 @@ const AnalyticsSchema = new mongoose.Schema(
       ref: "Media",
       required: true,
     },
+    duration:{
+      type: Number,
+      default: 0
+    },
     playedAt: {
       type: Date,
       default: Date.now,

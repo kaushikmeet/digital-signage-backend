@@ -1,15 +1,19 @@
 const jwt = require("jsonwebtoken");
 
 exports.auth = (req, res, next) => {
-  const header = req.headers.authorization;
+  const authHeader = req.headers.authorization;
+  let token = null;
 
-  if (!header) {
-    return res.status(401).json({ error: "No token provided" });
+   if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
   }
 
-  const token = header.split(" ")[1];
-  if (!token) {
-    return res.status(401).json({ error: "Malformed token" });
+  if (!token && req.query.token) {
+    token = req.query.token;
+  }
+
+   if (!token) {
+    return res.status(401).json({ error: "No token provided" });
   }
 
   try {
