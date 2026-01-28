@@ -44,12 +44,13 @@ exports.logPlay = async (req, res) => {
 /* CREATE PLAY LOG */
 exports.createAnalyticsEntry = async (req, res) => {
   try {
-    const { screenId, mediaId, duration = 0 } = req.body;
+    const { screenId, mediaId, duration = 0, zoneId } = req.body;
 
     await Analytics.create({
       screenId,
       mediaId,
       duration,
+      zoneId
     });
 
     res.json({ success: true });

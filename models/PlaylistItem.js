@@ -5,7 +5,8 @@ const PlaylistItemSchema = new mongoose.Schema(
     playlistId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Playlist",
-      required: true
+      required: true,
+      index: true
     },
 
     mediaId: {
@@ -16,32 +17,50 @@ const PlaylistItemSchema = new mongoose.Schema(
 
     duration: {
       type: Number,
-      required: true
+      required: true,
+      min: 1
     },
 
+    // 🔢 Order in playlist
     position: {
       type: Number,
-      default: 1
+      required: true,
+      index: true
     },
 
     // 📅 Days of week
     days: {
       type: [String],
+      enum: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
       default: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     },
 
-    // ⏱ Time in minutes (09:30 → 570)
+    // ⏱ Minutes since midnight (0–1440)
     startTime: {
       type: Number,
+      min: 0,
+      max: 1440,
       default: null
     },
 
     endTime: {
       type: Number,
-      default: null
+      min: 0,
+      max: 1440,
+      default: null,
+      validate: {
+        validator: function (v) {
+          if (v == null || this.startTime == null) return true;
+          return v > this.startTime;
+        },
+        message: "endTime must be greater than startTime"
+      }
     }
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    collection: "playlistitems"
+  }
 );
 
 module.exports = mongoose.model("PlaylistItem", PlaylistItemSchema);

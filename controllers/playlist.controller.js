@@ -101,14 +101,6 @@ exports.createReorderItems = async (req, res) => {
 
 /* ---------------- ACTIVE ITEMS ---------------- */
 
-// exports.ActivePlayListItem = async (req, res) => {
-//   const items = await PlaylistItem.find({
-//     playlistId: req.params.id
-//   }).populate("mediaId");
-
-//   res.json(items);
-// };
-
 exports.ActivePlayListItem = async (req, res) => {
   const now = new Date();
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -154,10 +146,8 @@ exports.ActivePlayListItem = async (req, res) => {
 };
 
 
-const toMinutes = (time) => {
-  const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
-};
+const normalizeTime = (v) =>
+  typeof v === "number" && !isNaN(v) ? v : null;
 
 exports.updatePlaylistItemSchedule = async (req, res) => {
   const { days, startTime, endTime } = req.body;
@@ -166,8 +156,8 @@ exports.updatePlaylistItemSchedule = async (req, res) => {
     req.params.id,
     {
       days,
-      startTime: startTime ? toMinutes(startTime) : null,
-      endTime: endTime ? toMinutes(endTime) : null
+      startTime: normalizeTime(startTime),
+      endTime: normalizeTime(endTime)
     },
     { new: true }
   );
