@@ -129,3 +129,17 @@ exports.fallbackMediaUpdate = async (req, res) => {
  const screen = await Screen.findById(req.params.id).populate("fallbackMediaId");
   res.json(screen?.fallbackMediaId || null);
 };
+
+exports.zoneWiseUpdate = async (req, res) => {
+  const { zones } = req.body;
+
+  const screen = await Screen.findById(req.params.id);
+  if (!screen) return res.status(404).json({ message: "Screen not found" });
+
+  screen.zones = [];            // reset
+  screen.zones.push(...zones); // re-add clean objects
+
+  await screen.save();
+
+  res.json(screen.zones);
+};

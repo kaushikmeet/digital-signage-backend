@@ -20,6 +20,10 @@ const AnalyticsSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    zoneId:{
+      type:String,
+      default:"main"
+    },
   },
   { timestamps: true }
 );

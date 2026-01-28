@@ -35,6 +35,6 @@ router.delete("/items/:id", auth, playlistController.deletePlayListItem);
 router.put("/items/reorder", auth, playlistController.createReorderItems);
 
 // schedule playlist item
-router.put("/items/:id/schedule", auth, playlistController.updatePlaylistItemSchedule);
+router.put("/:id/schedule", auth, playlistController.updatePlaylistItemSchedule);
 
 module.exports = router;

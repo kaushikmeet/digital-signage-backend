@@ -24,7 +24,11 @@ const proofOfPlaySchema = new mongoose.Schema(
       type: String,
       enum: ["played", "skipped"],
       default: "played"
-    }
+    },
+    zoneId:{
+      type:String,
+      default:"main"
+    },
   },
   {
     timestamps: true
