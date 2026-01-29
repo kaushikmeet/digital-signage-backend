@@ -291,3 +291,18 @@ exports.bestHours = async (req, res) => {
 
   res.json(data);
 };
+
+exports.analyticsByZone = async (req, res) => {
+  const data = await ProofOfPlay.aggregate([
+    { $match: { zoneId: new mongoose.Types.ObjectId(req.params.zoneId) } },
+    {
+      $group: {
+        _id: "$zoneId",
+        plays: { $sum: 1 },
+        duration: { $sum: "$duration" }
+      }
+    }
+  ]);
+
+  res.json(data[0] || { plays: 0, duration: 0 });
+};
