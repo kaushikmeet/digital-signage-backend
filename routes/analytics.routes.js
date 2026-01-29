@@ -12,7 +12,8 @@ const {
   revenueByMedia,
   bestTimeSlots,
   analyticsByScreen,
-  bestHours
+  bestHours,
+  analyticsByZone
 } = require("../controllers/analytics.controller");
 
 /* ===========================
@@ -55,5 +56,7 @@ router.get("/best-hours", auth, adminOnly, bestHours);
 
 // Export analytics as CSV
 router.get("/export/csv", auth, adminOnly, exportCsv);
+
+router.get("/zone/:id", auth, analyticsByZone);
 
 module.exports = router;
