@@ -8,6 +8,7 @@ const mediaRoutes = require("./routes/media.routes");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
+const screenGroupRoute = require("./routes/screenGroup.routes");
 
 
 const app = express();
@@ -27,6 +28,7 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/analytics", analyticsRoutes);
 app.use("/emergency", require("./routes/emergency.routes"));
+app.use("/screen-groups", screenGroupRoute);
 
 /* ---------- HEALTH CHECK ---------- */
 app.get("/", (req, res) => {

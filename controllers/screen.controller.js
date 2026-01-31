@@ -1,5 +1,6 @@
 // controllers/screens.controller.js
 const Screen = require("../models/Screen");
+const Media = require("../models/Media");
 
 exports.getScreens = async (req, res) => {
   const screens = await Screen.aggregate([
@@ -143,3 +144,63 @@ exports.zoneWiseUpdate = async (req, res) => {
 
   res.json(screen.zones);
 };
+
+exports.getZones = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid screen id" });
+    }
+
+    const screen = await Screen.findById(id).lean();
+
+    if (!screen) {
+      return res.status(404).json({ error: "Screen not found" });
+    }
+
+    res.json(screen.zones || []);
+  } catch (err) {
+    console.error("Get zones error:", err);
+    res.status(500).json({ error: "Failed to load zones" });
+  }
+};
+
+exports.updateZones = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let { zones } = req.body;
+
+    zones = await sanitizeZones(zones);
+
+    await Screen.findByIdAndUpdate(id, { zones });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Zone update failed" });
+  }
+};
+
+
+async function sanitizeZones(zones) {
+  const mediaIds = zones
+    .map(z => z.fallbackMediaId)
+    .filter(Boolean);
+
+  const existingMedia = await Media.find({
+    _id: { $in: mediaIds }
+  }).select("_id");
+
+  const validIds = new Set(
+    existingMedia.map(m => m._id.toString())
+  );
+
+  return zones.map(z => ({
+    ...z,
+    fallbackMediaId:
+      z.fallbackMediaId && validIds.has(z.fallbackMediaId.toString())
+        ? z.fallbackMediaId
+        : null
+  }));
+}

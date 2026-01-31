@@ -11,6 +11,10 @@ module.exports = function (io) {
       console.log("📺 Screen joined:", screenId);
     });
 
+     socket.on("register-group", groupId => {
+      socket.join(`group-${groupId}`);
+    });
+
     socket.on("screen-heartbeat", (screenId) => {
       onlineScreens.set(screenId, Date.now());
       // console.log("❤️ Heartbeat from:", screenId);
@@ -53,7 +57,11 @@ module.exports = function (io) {
       }
     );
   });
-
-  });
   
+  socket.on("join-group", groupId => {
+    socket.join(`group-${groupId}`);
+  });
+
+  socket.on("disconnect", () => {});
+});
 };

@@ -29,7 +29,11 @@ const zoneSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Media",
       default: null
-    }
+    },
+
+    timeline: {type: Array, default: [] },
+    widget: { type: Object, default: null },
+    locked: { type: Boolean, default: false }
   },
   { _id: true }
 );

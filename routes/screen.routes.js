@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const {auth, adminOnly} = require("../middleware/auth.middleware");
-const {createScreen, getScreens, deleteScreen, getScreenById, bulkDeleteScreens, assignScreenToPlaylist, fallbackMediaUpdate, zoneWiseUpdate} = require("../controllers/screen.controller");
+const {createScreen, getScreens, deleteScreen, getScreenById, bulkDeleteScreens, assignScreenToPlaylist, fallbackMediaUpdate, zoneWiseUpdate, updateZones, getZones} = require("../controllers/screen.controller");
 
 /* CREATE SCREEN */
 router.get("/", auth, getScreens);
@@ -10,6 +10,7 @@ router.delete("/:id", auth, adminOnly, deleteScreen);
 router.delete("/bulk-delete", auth, adminOnly, bulkDeleteScreens);
 router.get("/:id", auth, getScreenById);
 router.get("/:id/fallback-media", auth, fallbackMediaUpdate); 
-router.put("/:id/zones", auth, zoneWiseUpdate); 
+router.put("/:id/zones", auth, updateZones); 
+router.get("/:id/zone", auth, getZones);
 
 module.exports = router;

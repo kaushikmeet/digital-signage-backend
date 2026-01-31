@@ -5,25 +5,43 @@ const AnalyticsSchema = new mongoose.Schema(
     screenId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Screen",
-      required: true,
+      index: true
     },
+
+    groupId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ScreenGroup",
+      index: true
+    },
+
+    zoneId: {
+      type: mongoose.Schema.Types.ObjectId,
+      index: true
+    },
+
     mediaId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Media",
-      required: true,
+      index: true
     },
-    duration:{
-      type: Number,
-      default: 0
+
+    playlistId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Playlist"
     },
+
+    type: {
+      type: String,
+      enum: ["media", "widget"],
+      default: "media"
+    },
+
     playedAt: {
       type: Date,
       default: Date.now,
+      index: true
     },
-    zoneId:{
-      type:String,
-      default:"main"
-    },
+    duration: Number
   },
   { timestamps: true }
 );

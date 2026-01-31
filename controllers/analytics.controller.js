@@ -44,10 +44,17 @@ exports.logPlay = async (req, res) => {
 /* CREATE PLAY LOG */
 exports.createAnalyticsEntry = async (req, res) => {
   try {
-    const { screenId, mediaId, duration = 0, zoneId } = req.body;
+    const {
+      screenId,
+      groupId = null,
+      mediaId,
+      duration = 0,
+      zoneId
+    } = req.body;
 
     await Analytics.create({
       screenId,
+      groupId, 
       mediaId,
       duration,
       zoneId
@@ -55,10 +62,11 @@ exports.createAnalyticsEntry = async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error("Analytics log failed:", err);
     res.status(500).json({ error: "Analytics log failed" });
   }
 };
+
 
 /* ===========================
    DASHBOARD SUMMARY
@@ -305,4 +313,68 @@ exports.analyticsByZone = async (req, res) => {
   ]);
 
   res.json(data[0] || { plays: 0, duration: 0 });
+};
+
+exports.getGroupAnalytics = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+
+    const data = await Analytics.aggregate([
+      {
+        $match: {
+          groupId: new mongoose.Types.ObjectId(groupId)
+        }
+      },
+
+      {
+        $group: {
+          _id: {
+            zoneId: "$zoneId",
+            mediaId: "$mediaId"
+          },
+          impressions: { $sum: 1 },
+          lastPlayedAt: { $max: "$playedAt" }
+        }
+      },
+
+      {
+        $lookup: {
+          from: "medias", // ✅ FIXED
+          localField: "_id.mediaId",
+          foreignField: "_id",
+          as: "media"
+        }
+      },
+
+      {
+        $unwind: {
+          path: "$media",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+
+      {
+        $project: {
+          _id: 0, // ✅ CLEAN OUTPUT
+          zoneId: "$_id.zoneId",
+          mediaId: "$_id.mediaId",
+          impressions: 1,
+          lastPlayedAt: 1,
+          media: {
+            _id: "$media._id",
+            filename: "$media.filename",
+            type: "$media.type",
+            url: "$media.url"
+          }
+        }
+      },
+
+      { $sort: { impressions: -1 } }
+    ]);
+
+    res.json(data);
+  } catch (err) {
+    console.error("Group analytics error:", err);
+    res.status(500).json({ error: "Failed to load group analytics" });
+  }
 };

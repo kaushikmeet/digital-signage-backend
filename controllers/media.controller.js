@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Media = require("../models/Media");
 const sanitizeHtml = require("sanitize-html");
 
@@ -68,3 +69,24 @@ exports.uploadMedia = async(req,res)=>{
 exports.getMedia = async (req, res)=>{
     res.json(await Media.find());
 }
+
+exports.getMediaById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid media id" });
+    }
+
+    const media = await Media.findById(id).lean();
+
+    if (!media) {
+      return res.status(404).json({ error: "Media not found" });
+    }
+
+    res.json(media);
+  } catch (err) {
+    console.error("Get media error:", err);
+    res.status(500).json({ error: "Failed to load media" });
+  }
+};
